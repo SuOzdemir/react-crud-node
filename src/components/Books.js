@@ -1,8 +1,10 @@
+import {InputSwitch} from "primereact/inputswitch";
+
 export default function Books() {
 
     return (
         <>
-            Books
+            <InputSwitch checked={true} />
         </>
     )
 }
