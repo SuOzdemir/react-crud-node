@@ -1,12 +1,12 @@
 import './App.css';
-import {Books} from "./component/Book";
+import Books from "./components/Books";
 
 
 function App() {
     return (
         <div className="App">
             <header className="App-header">
-                dxdg
+                <Books />
             </header>
         </div>
     );
