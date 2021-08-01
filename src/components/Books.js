@@ -24,7 +24,7 @@ export default function Books() {
 
     const [bookNameInput  , setBookNameInput] = useState('');
     const [authorNameInput, setAuthorNameInput] = useState('');
-    const [selectedCategory, setCategoryInput] = useState('ALL');
+    const [selectedCategory, setSelectedCategory] = useState('');
 /*
     const initialBookState = {
         bookName: '',
@@ -73,7 +73,6 @@ export default function Books() {
   */
 
     const categories = [
-        {label: ' Hepsi', value: 'ALL'},
         { label: 'Eğitim', value: 'EG' },
         { label: 'Hukuk', value: 'HKK' },
         { label: 'Siyaset', value: 'SY' },
@@ -81,25 +80,16 @@ export default function Books() {
         { label: 'Edebiyat', value: 'ED' }
     ];
 
-    async function addBook()
-    {
-       // console.log(book);
-        let bookparam={ book_name : bookNameInput ,author_name: authorNameInput
-            ,category:selectedCategory };
+    async function addBook() {
+        let bookparam={ bookName : bookNameInput ,authorName: authorNameInput, category:selectedCategory };
 
-         console.log(bookparam);
-         //todo  1 response dönmuyor
         const response = await axios.post('http://localhost:5000/books/book', bookparam)
             .catch(error => {
             console.error('There was an error!', error);
         });
 
-     /*  bookparam.id=response.data.id;
-        console.log(response.data);
-        console.log(bookparam);
-        let newList=[...list]; newList.push(response.data);
-        setList(newList);
-        resetInput();*/
+        resetInput();
+        getBooks();
     }
 
 
@@ -133,8 +123,9 @@ export default function Books() {
     function resetInput() {
         setBookNameInput("");
         setAuthorNameInput("");
-        setCategoryInput("");
+        setSelectedCategory('');
     }
+
     const editProduct = (product) => {
      //   setProduct({...product});
    //     setProductDialog(true);
@@ -187,7 +178,7 @@ export default function Books() {
                                 <Dropdown style={{width: '250px'}}
                                       value={selectedCategory}
                                       options={categories}
-                                      onChange={(e) => {  setCategoryInput(e.value); }}
+                                      onChange={(e) => {  setSelectedCategory(e.value); }}
                             />
                             </div>
 
