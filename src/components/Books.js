@@ -25,33 +25,21 @@ export default function Books() {
     const [bookNameInput  , setBookNameInput] = useState('');
     const [authorNameInput, setAuthorNameInput] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('');
-/*
-    const initialBookState = {
-        bookName: '',
-        authorName: '',
-        category: 'ALL',
-        price:''
-    }
-    const [book  , setBook] = useState(initialBookState);
 
-    const updateBook = (book) => {
-        setBook({ bookName: book.bookName, authorName: book.authorName,
-            category: book.category, price: book.price })
-    }
-*/
-   React.useEffect(() => {
+    const [editingBook, setEditingBook] = useState(null);
+
+   useEffect(() => {
         getBooks();
     }, []);
-   /*
 
-    useEffect(() => {
-        axios.get(baseURL).then((response) => {
-            setList(response.data);
-        });
-        console.log("----------------------");
-    }, []);
+   useEffect(() => {
+       if (editingBook) {
+           setBookNameInput(editingBook.book_name);
+           setAuthorNameInput(editingBook.author_name);
+           setSelectedCategory(editingBook.category);
+       }
+    }, [editingBook]);
 
-    */
     if (!list) return "No post !"
 
     async function getBooks() {
@@ -80,35 +68,6 @@ export default function Books() {
         { label: 'Edebiyat', value: 'ED' }
     ];
 
-    async function addBook() {
-        let bookparam={ bookName : bookNameInput ,authorName: authorNameInput, category:selectedCategory };
-
-        const response = await axios.post('http://localhost:5000/books/book', bookparam)
-            .catch(error => {
-            console.error('There was an error!', error);
-        });
-
-        resetInput();
-        getBooks();
-    }
-
-
-    async function  updateBook(rowData)
-    {
-        let bookparam={bookNameInput,authorNameInput,selectedCategory};
-        //todo 3 update put yazılacak
-        const response = await axios.post('http://localhost:5000/books/book', bookparam).catch(error => {
-            console.error('There was an error!', error);
-        });
-        //todo 4 yeniden hepsi çekilmesi, arrayin inmemory update inden daha kolay mı?
-        /*  bookparam.id=response.data.id;
-           console.log(response.data);
-           console.log(bookparam);
-           let newList=[...list]; newList.push(response.data);
-           setList(newList);
-           resetInput();*/
-    }
-
     //todo 1 ile  2  arasında ne fark var
    /* function  updateBookInput(rowData) { // function 1
         setBookNameInput(rawData.bookname);
@@ -126,19 +85,43 @@ export default function Books() {
         setSelectedCategory('');
     }
 
-    const editProduct = (product) => {
-     //   setProduct({...product});
-   //     setProductDialog(true);
+    async function handleSaveButton() {
+        const bookparam = { bookName : bookNameInput ,authorName: authorNameInput, category:selectedCategory };
+        if (editingBook) {
+            bookparam.id = editingBook.id;
+        }
+        const axiosFunc = editingBook ? axios.put : axios.post;
+
+        try {
+            await axiosFunc('http://localhost:5000/books/book', bookparam)
+            getBooks();
+            resetInput();
+        } catch (error) {
+            console.error('There was an error!', error);
+        }
     }
-    function handleAddButton(){
-        addBook();
+
+    async function handleDeleteButton(rowData) {
+        try {
+            await axios.delete(`http://localhost:5000/books/book`, {params: {id: rowData.id}});
+            getBooks();
+        } catch (error) {
+            console.error('There was an error!', error);
+        }
     }
+
+    function handleCancelButton(){
+        setEditingBook(null);
+        resetInput();
+    }
+
     const actionBodyTemplate = (rowData) => {
         return (
             <React.Fragment>
                 <Button icon="pi pi-pencil" className="p-button-rounded p-button-success p-mr-2"
-                        onClick={() => editBook(rowData)}/>
+                        onClick={() => setEditingBook(rowData)}/>
                 <Button icon="pi pi-trash" className="p-button-rounded p-button-warning"
+                        onClick={() => handleDeleteButton(rowData)}
                        />
             </React.Fragment>
         );
@@ -190,9 +173,8 @@ export default function Books() {
             <div className="p-field p-grid">
 
               <span >
-                    <Button label="Add" onClick={ handleAddButton} icon="pi pi-check" />
-                    <Button label="Update" icon="pi pi-check"/>
-                    <Button label="Delete" icon="pi pi-trash" />
+                    <Button label={editingBook ? 'Update' : 'Add'} onClick={ handleSaveButton} icon="pi pi-check" />
+                    <Button label="Cancel" onClick={ handleCancelButton} icon="pi pi-check" />
                 </span>
             </div>
         </div>
