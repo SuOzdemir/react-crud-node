@@ -183,7 +183,7 @@ export default function Users() {
             <div>
                 <h4>Library</h4>
                 <DataTable value={list}>
-                    <Column field="username" header="User Name"></Column>
+                    <Column field="name" header="User Name"></Column>
                     <Column field="email" header="Email"></Column>
                     <Column body={actionBodyTemplate}></Column>
                 </DataTable>
