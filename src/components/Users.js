@@ -17,7 +17,6 @@ import axios from 'axios';
 export default function Users() {
 
     //todo keyfilter={/^[^#<>*!]+$/}
-    //todo resetpassword
 
     const [list, setList] = useState([] );
 
